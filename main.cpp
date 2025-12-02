@@ -107,6 +107,85 @@ void printListFilm(Film *head)
          << endl;
 }
 
+// Menambah Penonton (Child)
+Penonton *addPenonton(string nama, string no_handphone)
+{
+    static int counter = 1;
+
+    Penonton *new_penonton = new Penonton();
+    new_penonton->id_penonton = "C-" + string(3 - to_string(counter).length(), '0') + to_string(counter);
+    new_penonton->nama = nama;
+    new_penonton->no_handphone = no_handphone;
+
+    new_penonton->next_penonton = NULL;
+
+    counter++;
+
+    return new_penonton;
+}
+
+// Insert Last Penonton (Child)
+void insertPenonton(string nama, string no_handphone, Penonton *&head)
+{
+    Penonton *new_penonton = addPenonton(nama, no_handphone);
+
+    if (head == NULL)
+    {
+        head = new_penonton;
+    }
+    else
+    {
+        Penonton *temp = head;
+
+        while (temp->next_penonton != NULL)
+        {
+            temp = temp->next_penonton;
+        }
+
+        temp->next_penonton = new_penonton;
+    }
+}
+
+// Cari Penonton (Child)
+Penonton *findPenonton(string nama, Penonton *&head)
+{
+    Penonton *p = head;
+    while (p != NULL)
+    {
+        if (p->nama == nama)
+            return p;
+        p = p->next_penonton;
+    }
+
+    return NULL;
+}
+
+// Menampilkan List Penonton (Child)
+void printPenonton(Penonton *head)
+{
+
+    Penonton *temp = head;
+
+    cout << "LIST PENONTON : " << endl
+         << endl;
+
+    while (temp != NULL)
+    {
+        cout << "Nama : " << temp->nama << endl;
+        cout << "No Handphone : " << temp->no_handphone << endl;
+        if (temp->next_penonton != NULL)
+        {
+            cout << endl;
+        }
+        temp = temp->next_penonton;
+    }
+
+    cout << endl;
+    cout << "===============================================";
+    cout << endl
+         << endl;
+}
+
 int main()
 {
 
@@ -121,7 +200,16 @@ int main()
     insertFilm("Harry Potter", "02-12-2025", "20:30", "STD-01", firstFilm, lastFilm);
     insertFilm("Harry Potter II", "03-12-2025", "10:30", "STD-01", firstFilm, lastFilm);
 
+    // print semua film ke layar
     printListFilm(firstFilm);
+
+    // Insert Penonton Ke Singly Linked List (Child)
+    insertPenonton("Nabil Lanten", "089657393880", headPenonton);
+    insertPenonton("Brigitta Dwi Lestari", "08132466282", headPenonton);
+    insertPenonton("Khalisa Assyifa", "085678926520", headPenonton);
+
+    // print semua penonton ke layar
+    printPenonton(headPenonton);
 
     return 0;
 }
