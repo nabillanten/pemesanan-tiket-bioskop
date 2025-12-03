@@ -97,7 +97,7 @@ void printListFilm(Film *head)
         cout << "Tanggal Tayang : " << temp->tanggal_tayang << endl;
         cout << "Jam Tayang : " << temp->jam_tayang << endl;
         cout << "Studio : " << temp->studio << endl;
-        if (temp->next_film != NULL) // Memeriksa apakah ada node berikutnya.
+        if (temp->next_film != NULL)
             cout << endl;
         temp = temp->next_film;
     }
@@ -186,6 +186,33 @@ void printPenonton(Penonton *head)
          << endl;
 }
 
+// Insert Pemesanan (Relasi)
+void insertPemesanan(Film *film, Penonton *penonton)
+{
+
+    if (film == NULL || penonton == NULL)
+        return;
+
+    Pemesanan *new_pemesanan = new Pemesanan;
+    new_pemesanan->penonton = penonton;
+    new_pemesanan->next_pemesanan = NULL;
+
+    if (film->next_pemesanan == NULL)
+    {
+        film->next_pemesanan = new_pemesanan;
+    }
+    else
+    {
+        Pemesanan *p = film->next_pemesanan;
+
+        while (p->next_pemesanan != NULL)
+        {
+            p = p->next_pemesanan;
+        }
+        p->next_pemesanan = new_pemesanan;
+    }
+};
+
 int main()
 {
 
@@ -210,6 +237,23 @@ int main()
 
     // print semua penonton ke layar
     printPenonton(headPenonton);
+
+    // Cari Film dengan judul Harry Potter
+    Film *f1 = findFilm("Harry Potter", firstFilm);
+
+    // Cari Penonton dengna nama Nabil Lanten
+    Penonton *p1 = findPenonton("Nabil Lanten", headPenonton);
+    // Cari Penonton dengna nama Brigitta Dwi Lestari
+    Penonton *p2 = findPenonton("Brigitta Dwi Lestari", headPenonton);
+
+    // Insert Relasi : Film Harry Potter, dengan penonton Nabil Lanten
+    insertPemesanan(f1, p1);
+
+    // Insert Relasi : Film Harry Potter, dengan penonton Brigitta Dwi lestari
+    insertPemesanan(f1, p2);
+
+    // Print film yang telah di tonton
+    cout << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << ", " << firstFilm->next_pemesanan->next_pemesanan->penonton->nama << endl;
 
     return 0;
 }
