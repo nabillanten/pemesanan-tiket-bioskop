@@ -213,6 +213,41 @@ void insertPemesanan(Film *film, Penonton *penonton)
     }
 };
 
+// Delete Pemesanan (Relasi)
+void deletePemesanan(Film *film, Penonton *target)
+{
+    if (film == NULL || film->next_pemesanan == NULL)
+    {
+        cout << "Tidak ada relasi yang dihapus\n";
+        return;
+    }
+
+    Pemesanan *current = film->next_pemesanan;
+    Pemesanan *prev = NULL;
+
+    while (current != NULL)
+    {
+        if (current->penonton == target)
+        {
+            if (prev == NULL)
+            {
+                film->next_pemesanan = current->next_pemesanan;
+            }
+            else
+            {
+                prev->next_pemesanan = current->next_pemesanan;
+            }
+
+            delete current;
+            cout << "Relasi dengan child \"" << target->nama << "\" berhasil dihapus\n";
+            return;
+        }
+        prev = current;
+        current = current->next_pemesanan;
+    }
+    cout << "Relasi tidak ditemukan\n";
+}
+
 int main()
 {
 
@@ -254,6 +289,13 @@ int main()
 
     // Print film yang telah di tonton
     cout << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << ", " << firstFilm->next_pemesanan->next_pemesanan->penonton->nama << endl;
+
+    // Delete Pemesanan : Menghapus relasi film Harry Potter dengan penonton dengan nama Nabil Lanten
+    deletePemesanan(f1, p1);
+
+    // Print film yang telah di tonton
+    cout
+        << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << endl;
 
     return 0;
 }
