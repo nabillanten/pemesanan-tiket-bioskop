@@ -248,6 +248,34 @@ void deletePemesanan(Film *film, Penonton *target)
     cout << "Relasi tidak ditemukan\n";
 }
 
+// Find Pemesanan (Relasi)
+void findPemesanan(Film *film, Penonton *penonton)
+{
+    if (film == NULL || penonton == NULL)
+    {
+        cout << "Data film atau penonton tidak valid.\n";
+        return;
+    }
+
+    Pemesanan *current = film->next_pemesanan;
+
+    while (current != NULL)
+    {
+        if (current->penonton == penonton)
+        {
+            cout << "Film \"" << film->judul_film
+                 << "\" berelasi dengan penonton \""
+                 << penonton->nama << "\".\n";
+            return; // selesai
+        }
+        current = current->next_pemesanan;
+    }
+
+    cout << "Film \"" << film->judul_film
+         << "\" tidak berelasi dengan penonton \""
+         << penonton->nama << "\".\n";
+}
+
 int main()
 {
 
@@ -290,12 +318,18 @@ int main()
     // Print film yang telah di tonton
     cout << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << ", " << firstFilm->next_pemesanan->next_pemesanan->penonton->nama << endl;
 
+    // Find Pemesanan : Mencari apakah Film Harry Potter memiliki relasi dengan penonton Nabil Lanten
+    findPemesanan(f1, p1);
+
     // Delete Pemesanan : Menghapus relasi film Harry Potter dengan penonton dengan nama Nabil Lanten
     deletePemesanan(f1, p1);
 
     // Print film yang telah di tonton
     cout
         << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << endl;
+
+    // Find Pemesanan : Mencari apakah Film Harry Potter memiliki relasi dengan penonton Nabil Lanten
+    findPemesanan(f1, p1);
 
     return 0;
 }
