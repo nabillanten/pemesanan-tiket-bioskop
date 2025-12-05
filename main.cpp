@@ -333,3 +333,215 @@ int main()
 
     return 0;
 }
+
+// delete penonton (child)
+void deletePenonton(Penonton *&headPenonton, Film *headFilm, Penonton *target)
+{
+    if (target == NULL)
+    {
+        cout << "Penonton tidak ditemukan\n";
+        return;
+    }
+
+    if (headPenonton == NULL)
+    {
+        cout << "Tidak ada penonton yang dihapus\n";
+        return;
+    }
+
+    Film *f = headFilm;
+    while (f != NULL)
+    {
+        deletePemesanan(f, target);
+        f = f->next_film;
+    }
+
+    Penonton *current = headPenonton;
+    Penonton *prev = NULL;
+
+    while (current != NULL)
+    {
+        if (current == target)
+        {
+            if (prev == NULL)
+            {
+                headPenonton = current->next_penonton;
+            }
+            else
+            {
+                prev->next_penonton = current->next_penonton;
+            }
+
+            delete current;
+            cout << "Penonton \"" << target->nama << "\" berhasil dihapus\n";
+            return;
+        }
+
+        prev = current;
+        current = current->next_penonton;
+    }
+
+    cout << "Penonton tidak ditemukan\n";
+}
+
+// find penonton (child)
+Penonton* findPenonton(string nama, Penonton* head)
+{
+    Penonton* p = head;
+
+    while (p != NULL)
+    {
+        if (p->nama == nama)
+        {
+            return p;
+        }
+        p = p->next_penonton;
+    }
+    return NULL;
+}
+
+// show all penonton (child)
+void showAllPenonton(Penonton* headPenonton)
+{
+    if (headPenonton == NULL)
+    {
+        cout << "Tidak ada data penonton\n\n";
+        return;
+    }
+
+    Penonton* p = headPenonton;
+
+    cout << "DATA PENONTON:\n\n";
+
+    while (p != NULL)
+    {
+        cout << "ID Penonton: " << p->id_penonton << "\n";
+        cout << "Nama: " << p->nama << "\n";
+        cout << "No HP: " << p->no_handphone << "\n\n";
+        p = p->next_penonton;
+    }
+}
+
+// Show penonton beserta Semua Film yang di tonton (child)
+void showPenontonDanFilm(Penonton* headPenonton, Film* headFilm)
+{
+    if (headPenonton == NULL)
+    {
+        cout << "Tidak ada data penonton\n\n";
+        return;
+    }
+
+    Penonton* p = headPenonton;
+
+    cout << "Data Penonton dan Film yang Ditonton:\n\n";
+
+    while (p != NULL)
+    {
+        cout << "Nama: " << p->nama << "\n";
+        cout << "No HP: " << p->no_handphone << "\n";
+
+        bool adaRelasi = false;
+
+        Film* f = headFilm;
+        while (f != NULL)
+        {
+            Pemesanan* pm = f->next_pemesanan;
+
+            while (pm != NULL)
+            {
+                if (pm->penonton == p)
+                {
+                    if (!adaRelasi)
+                    {
+                        cout << "Film yang ditonton:\n";
+                        adaRelasi = true;
+                    }
+                    cout << "- " << f->judul_film << " (" << f->tanggal_tayang << ", " << f->jam_tayang << ", " << f->studio << ")\n";
+                }
+                pm = pm->next_pemesanan;
+            }
+
+            f = f->next_film;
+        }
+
+        if (!adaRelasi)
+        {
+            cout << "Tidak menonton film\n";
+        }
+
+        cout << "\n";
+        p = p->next_penonton;
+    }
+}
+
+// count jumlah relasi penonton film tertentu (child)
+int countRelasiPenonton(Penonton* target, Film* headFilm)
+{
+    int count = 0;
+
+    Film* f = headFilm;
+
+    while (f != NULL)
+    {
+        Pemesanan* pm = f->next_pemesanan;
+
+        while (pm != NULL)
+        {
+            if (pm->penonton == target)
+            {
+                count++;
+            }
+            pm = pm->next_pemesanan;
+        }
+
+        f = f->next_film;
+    }
+
+    return count;
+}
+
+// penonton yang tidak memiliki relasi (child)
+
+int countPenontonTanpaRelasi(Penonton* headPenonton, Film* headFilm)
+{
+    int total = 0;
+
+    Penonton* p = headPenonton;
+
+    while (p != NULL)
+    {
+        bool ada = false;
+
+        Film* f = headFilm;
+        while (f != NULL)
+        {
+            Pemesanan* pm = f->next_pemesanan;
+
+            while (pm != NULL)
+            {
+                if (pm->penonton == p)
+                {
+                    ada = true;
+                    break;
+                }
+                pm = pm->next_pemesanan;
+            }
+
+            if (ada)
+                break;
+
+            f = f->next_film;
+        }
+
+        if (!ada)
+        {
+            total++;
+        }
+
+        p = p->next_penonton;
+    }
+
+    return total;
+}
+
+
