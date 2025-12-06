@@ -30,161 +30,7 @@ struct Film
     Pemesanan *next_pemesanan;
 };
 
-// Menambah Film (Parent)
-Film *addFilm(string judul_film, string tanggal_tayang, string jam_tayang, string studio)
-{
-
-    static int counter = 1;
-
-    Film *new_film = new Film();
-
-    new_film->id_film = "F-" + string(3 - to_string(counter).length(), '0') + to_string(counter);
-    new_film->judul_film = judul_film;
-    new_film->tanggal_tayang = tanggal_tayang;
-    new_film->jam_tayang = jam_tayang;
-    new_film->studio = studio;
-    new_film->next_film = new_film->prev_film = NULL;
-    new_film->next_pemesanan = NULL;
-
-    counter++;
-
-    return new_film;
-}
-
-// Insert Last Film (Parent)
-void insertFilm(string judul_film, string tanggal_tayang, string jam_tayang, string studio, Film *&head, Film *&tail)
-{
-    Film *new_film = addFilm(judul_film, tanggal_tayang, jam_tayang, studio);
-
-    if (tail == NULL)
-    {
-        head = tail = new_film;
-    }
-    else
-    {
-        tail->next_film = new_film;
-        new_film->prev_film = tail;
-        tail = new_film;
-    }
-}
-
-// Cari Film (Parent)
-Film *findFilm(string judul, Film *&head)
-{
-    Film *p = head;
-
-    while (p != NULL)
-    {
-        if (p->judul_film == judul)
-            return p;
-        p = p->next_film;
-    }
-    return NULL;
-}
-
-// Menampilkan List Film (Parent)
-void printListFilm(Film *head)
-{
-    Film *temp = head;
-
-    cout << "LIST FILM : " << endl
-         << endl;
-
-    while (temp != NULL)
-    {
-        cout << "ID Film : " << temp->id_film << endl;
-        cout << "Judul Film : " << temp->judul_film << endl;
-        cout << "Tanggal Tayang : " << temp->tanggal_tayang << endl;
-        cout << "Jam Tayang : " << temp->jam_tayang << endl;
-        cout << "Studio : " << temp->studio << endl;
-        if (temp->next_film != NULL)
-            cout << endl;
-        temp = temp->next_film;
-    }
-    cout << endl;
-    cout << "===============================================";
-    cout << endl
-         << endl;
-}
-
-// Menambah Penonton (Child)
-Penonton *addPenonton(string nama, string no_handphone)
-{
-    static int counter = 1;
-
-    Penonton *new_penonton = new Penonton();
-    new_penonton->id_penonton = "C-" + string(3 - to_string(counter).length(), '0') + to_string(counter);
-    new_penonton->nama = nama;
-    new_penonton->no_handphone = no_handphone;
-
-    new_penonton->next_penonton = NULL;
-
-    counter++;
-
-    return new_penonton;
-}
-
-// Insert Last Penonton (Child)
-void insertPenonton(string nama, string no_handphone, Penonton *&head)
-{
-    Penonton *new_penonton = addPenonton(nama, no_handphone);
-
-    if (head == NULL)
-    {
-        head = new_penonton;
-    }
-    else
-    {
-        Penonton *temp = head;
-
-        while (temp->next_penonton != NULL)
-        {
-            temp = temp->next_penonton;
-        }
-
-        temp->next_penonton = new_penonton;
-    }
-}
-
-// Cari Penonton (Child)
-Penonton *findPenonton(string nama, Penonton *head) // Perubahan: head tidak perlu reference di sini
-{
-    Penonton *p = head;
-    while (p != NULL)
-    {
-        if (p->nama == nama)
-            return p;
-        p = p->next_penonton;
-    }
-
-    return NULL;
-}
-
-// Menampilkan List Penonton (Child)
-void printPenonton(Penonton *head)
-{
-
-    Penonton *temp = head;
-
-    cout << "LIST PENONTON : " << endl
-         << endl;
-
-    while (temp != NULL)
-    {
-        cout << "Nama : " << temp->nama << endl;
-        cout << "No Handphone : " << temp->no_handphone << endl;
-        if (temp->next_penonton != NULL)
-        {
-            cout << endl;
-        }
-        temp = temp->next_penonton;
-    }
-
-    cout << endl;
-    cout << "===============================================";
-    cout << endl
-         << endl;
-}
+// ===== RELATION SECTION START =====
 
 // Insert Pemesanan (Relasi)
 void insertPemesanan(Film *film, Penonton *penonton)
@@ -280,6 +126,326 @@ void findPemesanan(Film *film, Penonton *penonton)
          << endl;
 }
 
+// ===== RELATION SECTION END =====
+
+// ===== PARENT SECTION START =====
+
+// Menambah Film (Parent)
+Film *addFilm(string judul_film, string tanggal_tayang, string jam_tayang, string studio)
+{
+
+    static int counter = 1;
+
+    Film *new_film = new Film();
+
+    new_film->id_film = "F-" + string(3 - to_string(counter).length(), '0') + to_string(counter);
+    new_film->judul_film = judul_film;
+    new_film->tanggal_tayang = tanggal_tayang;
+    new_film->jam_tayang = jam_tayang;
+    new_film->studio = studio;
+    new_film->next_film = new_film->prev_film = NULL;
+    new_film->next_pemesanan = NULL;
+
+    counter++;
+
+    return new_film;
+}
+
+// Insert Last Film (Parent)
+void insertFilm(string judul_film, string tanggal_tayang, string jam_tayang, string studio, Film *&head, Film *&tail)
+{
+    Film *new_film = addFilm(judul_film, tanggal_tayang, jam_tayang, studio);
+
+    if (tail == NULL)
+    {
+        head = tail = new_film;
+    }
+    else
+    {
+        tail->next_film = new_film;
+        new_film->prev_film = tail;
+        tail = new_film;
+    }
+}
+
+// 1. DELETE FILM (PARENT)
+// Menghapus film dari list parent, termasuk seluruh relasi yang berhubungan dengan film tersebut
+void deleteFilm(Film *&head, Film *&tail, string judul_film, Penonton *&headPenonton)
+{
+    if (head == NULL)
+    {
+        cout << "List film kosong!" << endl;
+        return;
+    }
+
+    Film *current = head;
+    Film *prev = NULL;
+
+    // Cari film yang akan dihapus
+    while (current != NULL && current->judul_film != judul_film)
+    {
+        prev = current;
+        current = current->next_film;
+    }
+
+    // Jika film tidak ditemukan
+    if (current == NULL)
+    {
+        cout << "Film dengan judul '" << judul_film << "' tidak ditemukan!" << endl;
+        return;
+    }
+
+    // Hapus semua relasi pemesanan yang terkait dengan film ini
+    Pemesanan *pemesanan = current->next_pemesanan;
+    while (pemesanan != NULL)
+    {
+        Pemesanan *temp = pemesanan;
+        pemesanan = pemesanan->next_pemesanan;
+        delete temp;
+    }
+    current->next_pemesanan = NULL;
+
+    // Hapus node film dari doubly linked list
+    if (prev == NULL)
+    { // Film berada di head
+        head = current->next_film;
+        if (head != NULL)
+        {
+            head->prev_film = NULL;
+        }
+        else
+        {
+            tail = NULL; // List menjadi kosong
+        }
+    }
+    else if (current->next_film == NULL)
+    { // Film berada di tail
+        tail = current->prev_film;
+        if (tail != NULL)
+        {
+            tail->next_film = NULL;
+        }
+    }
+    else
+    { // Film di tengah
+        prev->next_film = current->next_film;
+        current->next_film->prev_film = prev;
+    }
+
+    cout << "Film '" << judul_film << "' berhasil dihapus beserta semua relasinya!" << endl;
+    delete current;
+}
+
+// 2. FIND FILM (PARENT) - Versi alternatif dengan pencarian lebih fleksibel
+// Mencari node film berdasarkan judul atau id_film
+Film *findFilmByJudul(string judul, Film *&head)
+{
+    Film *p = head;
+    while (p != NULL)
+    {
+        if (p->judul_film == judul)
+            return p;
+        p = p->next_film;
+    }
+    return NULL;
+}
+
+// 3. SHOW ALL FILM (LIST PARENT) - Versi lebih informatif
+// Menampilkan semua film yang ada di list parent dengan informasi lebih lengkap
+void showAllFilm(Film *head)
+{
+    if (head == NULL)
+    {
+        cout << "Belum ada film yang tersedia!" << endl;
+        cout << "===============================================" << endl
+             << endl;
+        return;
+    }
+
+    Film *temp = head;
+    int counter = 1;
+
+    cout << "DAFTAR SEMUA FILM (PARENT LIST):" << endl
+         << endl;
+
+    while (temp != NULL)
+    {
+        cout << counter++ << ". ID Film       : " << temp->id_film << endl;
+        cout << "   Judul Film    : " << temp->judul_film << endl;
+        cout << "   Tanggal Tayang: " << temp->tanggal_tayang << endl;
+        cout << "   Jam Tayang    : " << temp->jam_tayang << endl;
+        cout << "   Studio        : " << temp->studio << endl;
+
+        // Tampilkan jumlah penonton yang memesan film ini
+        int countPenonton = 0;
+        Pemesanan *p = temp->next_pemesanan;
+        while (p != NULL)
+        {
+            countPenonton++;
+            p = p->next_pemesanan;
+        }
+        cout << "   Jumlah Penonton: " << countPenonton << " orang" << endl
+             << endl;
+
+        temp = temp->next_film;
+    }
+    cout << "===============================================" << endl
+         << endl;
+}
+
+// 4. SHOW PENONTON DARI FILM TERTENTU
+// Menampilkan daftar penonton yang menonton film tertentu melalui relasi pada parent film tersebut
+void showPenontonFromFilm(Film *film)
+{
+    if (film == NULL)
+    {
+        cout << "Film tidak ditemukan!" << endl;
+        return;
+    }
+
+    cout << "DAFTAR PENONTON FILM: " << film->judul_film << endl;
+    cout << "ID Film: " << film->id_film << endl;
+    cout << "Studio: " << film->studio << " | " << film->tanggal_tayang << " " << film->jam_tayang << endl;
+    cout << "===============================================" << endl;
+
+    Pemesanan *pemesanan = film->next_pemesanan;
+
+    if (pemesanan == NULL)
+    {
+        cout << "Belum ada penonton yang memesan film ini." << endl
+             << endl;
+        return;
+    }
+
+    int counter = 1;
+    while (pemesanan != NULL)
+    {
+        cout << counter++ << ". ID Penonton : " << pemesanan->penonton->id_penonton << endl;
+        cout << "   Nama        : " << pemesanan->penonton->nama << endl;
+        cout << "   No. HP      : " << pemesanan->penonton->no_handphone << endl
+             << endl;
+        pemesanan = pemesanan->next_pemesanan;
+    }
+    cout << "===============================================" << endl
+         << endl;
+}
+
+// 5. SHOW FILM YANG DITONTON OLEH PENONTON TERTENTU
+// Mencari penonton tertentu lalu menampilkan daftar film yang telah ia tonton
+void showFilmFromPenonton(Penonton *penonton, Film *headFilm)
+{
+    if (penonton == NULL)
+    {
+        cout << "Penonton tidak ditemukan!" << endl;
+        return;
+    }
+
+    cout << "DAFTAR FILM YANG DITONTON OLEH: " << penonton->nama << endl;
+    cout << "ID Penonton: " << penonton->id_penonton << endl;
+    cout << "No. HP: " << penonton->no_handphone << endl;
+    cout << "===============================================" << endl;
+
+    Film *tempFilm = headFilm;
+    bool adaFilm = false;
+    int counter = 1;
+
+    while (tempFilm != NULL)
+    {
+        Pemesanan *pemesanan = tempFilm->next_pemesanan;
+        bool sudahNonton = false;
+
+        // Cek apakah penonton ini memesan film ini
+        while (pemesanan != NULL)
+        {
+            if (pemesanan->penonton == penonton)
+            {
+                sudahNonton = true;
+                break;
+            }
+            pemesanan = pemesanan->next_pemesanan;
+        }
+
+        // Jika penonton menonton film ini, tampilkan info film
+        if (sudahNonton)
+        {
+            cout << counter++ << ". ID Film       : " << tempFilm->id_film << endl;
+            cout << "   Judul Film    : " << tempFilm->judul_film << endl;
+            cout << "   Tanggal Tayang: " << tempFilm->tanggal_tayang << endl;
+            cout << "   Jam Tayang    : " << tempFilm->jam_tayang << endl;
+            cout << "   Studio        : " << tempFilm->studio << endl
+                 << endl;
+            adaFilm = true;
+        }
+
+        tempFilm = tempFilm->next_film;
+    }
+
+    if (!adaFilm)
+    {
+        cout << "Penonton ini belum menonton film apapun." << endl
+             << endl;
+    }
+    cout << "===============================================" << endl
+         << endl;
+}
+
+// ===== PARENT SECTION END =====
+
+// ===== CHILD SECTION START =====
+
+// Menambah Penonton (Child)
+Penonton *addPenonton(string nama, string no_handphone)
+{
+    static int counter = 1;
+
+    Penonton *new_penonton = new Penonton();
+    new_penonton->id_penonton = "C-" + string(3 - to_string(counter).length(), '0') + to_string(counter);
+    new_penonton->nama = nama;
+    new_penonton->no_handphone = no_handphone;
+
+    new_penonton->next_penonton = NULL;
+
+    counter++;
+
+    return new_penonton;
+}
+
+// Insert Last Penonton (Child)
+void insertPenonton(string nama, string no_handphone, Penonton *&head)
+{
+    Penonton *new_penonton = addPenonton(nama, no_handphone);
+
+    if (head == NULL)
+    {
+        head = new_penonton;
+    }
+    else
+    {
+        Penonton *temp = head;
+
+        while (temp->next_penonton != NULL)
+        {
+            temp = temp->next_penonton;
+        }
+
+        temp->next_penonton = new_penonton;
+    }
+}
+
+// Cari Penonton (Child)
+Penonton *findPenonton(string nama, Penonton *head) // Perubahan: head tidak perlu reference di sini
+{
+    Penonton *p = head;
+    while (p != NULL)
+    {
+        if (p->nama == nama)
+            return p;
+        p = p->next_penonton;
+    }
+
+    return NULL;
+}
+
 // delete penonton (child)
 void deletePenonton(Penonton *&headPenonton, Film *headFilm, Penonton *target)
 {
@@ -318,8 +484,8 @@ void deletePenonton(Penonton *&headPenonton, Film *headFilm, Penonton *target)
                 prev->next_penonton = current->next_penonton;
             }
 
-            delete current;
             cout << "Penonton \"" << target->nama << "\" berhasil dihapus\n";
+            delete current;
             return;
         }
 
@@ -482,6 +648,7 @@ int countPenontonTanpaRelasi(Penonton *headPenonton, Film *headFilm)
     return total;
 }
 
+// ===== CHILD SECTION END =====
 
 int main()
 {
@@ -493,91 +660,82 @@ int main()
     // Singly Linked List Penonton (Child)
     Penonton *headPenonton = NULL;
 
-    // Insert Film ke Doubly Linked List (Parent)
-    insertFilm("Harry Potter", "02-12-2025", "20:30", "STD-01", firstFilm, lastFilm); // F-001
-    insertFilm("Harry Potter II", "03-12-2025", "10:30", "STD-01", firstFilm, lastFilm); // F-002
+    // Insert beberapa film untuk demo
+    cout << "MEMBUAT DATA FILM:" << endl;
+    insertFilm("Harry Potter", "02-12-2025", "20:30", "STD-01", firstFilm, lastFilm);
+    insertFilm("Harry Potter II", "03-12-2025", "10:30", "STD-01", firstFilm, lastFilm);
+    insertFilm("Now You See Me 3", "04-12-2025", "15:00", "STD-02", firstFilm, lastFilm);
+    insertFilm("Avengers: Endgame", "05-12-2025", "19:00", "STD-03", firstFilm, lastFilm);
+    cout << "Data film berhasil ditambahkan!" << endl
+         << endl;
 
-    // print semua film ke layar
-    printListFilm(firstFilm);
+    // Insert beberapa penonton
+    cout << "MEMBUAT DATA PENONTON:" << endl;
+    insertPenonton("Nabil Lanten", "089657393880", headPenonton);
+    insertPenonton("Brigitta Dwi Lestari", "08132466282", headPenonton);
+    insertPenonton("Khalisa Assyifa", "085678926520", headPenonton);
+    insertPenonton("Jeki", "081388879123", headPenonton);
+    cout << "Data penonton berhasil ditambahkan!" << endl
+         << endl;
 
-    // Insert Penonton Ke Singly Linked List (Child)
-    insertPenonton("Nabil Lanten", "089657393880", headPenonton); // C-001
-    insertPenonton("Brigitta Dwi Lestari", "08132466282", headPenonton); // C-002
-    insertPenonton("Khalisa Assyifa", "085678926520", headPenonton); // C-003
+    // SHOW ALL FILM
+    cout << "SHOW ALL FILM :" << endl;
+    showAllFilm(firstFilm);
 
-    // print semua penonton ke layar
-    printPenonton(headPenonton);
+    // FIND FILM (Fungsi yang sudah ada)
+    cout << "FIND FILM 'Harry Potter':" << endl;
+    Film *f1 = findFilmByJudul("Harry Potter", firstFilm);
+    if (f1 != NULL)
+    {
+        cout << "Film ditemukan! ID: " << f1->id_film << ", Studio: " << f1->studio << endl
+             << endl;
+    }
 
-    // Cari Film dengan judul Harry Potter
-    Film *f1 = findFilm("Harry Potter", firstFilm);
+    // DELETE FILM
+    cout << "DELETE FILM 'Now You See Me 3':" << endl;
+    cout << "Sebelum delete:" << endl;
+    showAllFilm(firstFilm);
 
-    // Cari Penonton dengna nama Nabil Lanten
+    deleteFilm(firstFilm, lastFilm, "Now You See Me 3", headPenonton);
+
+    cout << "Setelah delete:" << endl;
+    showAllFilm(firstFilm);
+
+    // Tambah relasi pemesanan untuk demo
+    cout << "MEMBUAT RELASI PEMESANAN:" << endl;
+    // Film *f1 = findFilmByJudul("Harry Potter", firstFilm);
+    Film *f2 = findFilmByJudul("Harry Potter II", firstFilm);
+    Film *f4 = findFilmByJudul("Avengers: Endgame", firstFilm);
+
     Penonton *p1 = findPenonton("Nabil Lanten", headPenonton);
-    // Cari Penonton dengna nama Brigitta Dwi Lestari
     Penonton *p2 = findPenonton("Brigitta Dwi Lestari", headPenonton);
+    Penonton *p3 = findPenonton("Khalisa Assyifa", headPenonton);
+    Penonton *p4 = findPenonton("Jeki", headPenonton);
 
-    // Insert Relasi : Film Harry Potter, dengan penonton Nabil Lanten
+    // Tambah beberapa relasi
     insertPemesanan(f1, p1);
-
-    // Insert Relasi : Film Harry Potter, dengan penonton Brigitta Dwi lestari
     insertPemesanan(f1, p2);
-
-    // Print film yang telah di tonton
-    cout << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << ", " << firstFilm->next_pemesanan->next_pemesanan->penonton->nama << endl;
-
-    // Find Pemesanan : Mencari apakah Film Harry Potter memiliki relasi dengan penonton Nabil Lanten
-    findPemesanan(f1, p1);
-
-    // Delete Pemesanan : Menghapus relasi film Harry Potter dengan penonton dengan nama Nabil Lanten
-    deletePemesanan(f1, p1);
-
-    // Print film yang telah di tonton
-    cout
-        << "Film " << firstFilm->judul_film << " telah ditonton oleh : " << firstFilm->next_pemesanan->penonton->nama << endl;
-
-    // Find Pemesanan : Mencari apakah Film Harry Potter memiliki relasi dengan penonton Nabil Lanten
-    findPemesanan(f1, p1);
-
-    // Tambah Film baru
-    insertFilm("Now You See Me 3", "04-12-2025", "15:00", "STD-02", firstFilm, lastFilm); // F-003
-
-    // Tambah Penonton (Untuk demo multi-relasi dan tanpa relasi)
-    insertPenonton("Jeki", "081388879123", headPenonton); // C-004
-
-    // Cari Pointer untuk data baru
-    Film *f2 = findFilm("Harry Potter II", firstFilm); // F-002
-    Film *f3 = findFilm("Now You See Me 3", firstFilm); // F-003
-    Penonton *p3 = findPenonton("Khalisa Assyifa", headPenonton); // C-003
-    Penonton *p4 = findPenonton("Jeki", headPenonton); // C-004
-
-    // Tambah Relasi:
-    // P2 (Brigitta) sudah nonton F1. Tambah dia nonton F2 juga.
     insertPemesanan(f2, p2);
-    // P4 (Jeki) nonton F2 dan F3 (2 relasi)
     insertPemesanan(f2, p4);
-    insertPemesanan(f3, p4);
-    // P3 (Khalisa) nonton F3
-    insertPemesanan(f3, p3);
+    insertPemesanan(f1, p4);
+    insertPemesanan(f4, p1);
+    insertPemesanan(f4, p2);
+    insertPemesanan(f4, p3);
+    cout << "Relasi pemesanan berhasil ditambahkan!" << endl
+         << endl;
+
+    // SHOW PENONTON DARI FILM TERTENTU
+    cout << "SHOW PENONTON DARI FILM 'Avengers: Endgame':" << endl;
+    showPenontonFromFilm(f4);
+
+    // SHOW FILM YANG DITONTON OLEH PENONTON TERTENTU
+    cout << "SHOW FILM YANG DITONTON OLEH 'Brigitta Dwi Lestari':" << endl;
+    showFilmFromPenonton(p2, firstFilm);
+
+    // ============== kalisa ================
 
     // Show All Penonton (List Child)
     showAllPenonton(headPenonton);
-
-    // Find Penonton (Child)
-    cout << "FIND PENONTON 'Jeki'\n";
-    Penonton *targetFind = findPenonton("Jeki", headPenonton);
-    if (targetFind != NULL) {
-        cout << "Penonton Ditemukan:\n";
-        cout << "ID Penonton: " << targetFind->id_penonton << "\n";
-        cout << "Nama: " << targetFind->nama << "\n";
-        cout << "No HP: " << targetFind->no_handphone << "\n\n";
-    } else {
-        cout << "Penonton tidak ditemukan.\n\n";
-    }
-
-    // Count Jumlah Relasi Penonton Film Tertentu
-    cout << "COUNT JUMLAH RELASI UNTUK PENONTON 'Jeki' \n";
-    int countJeki = countRelasiPenonton(p4, firstFilm);
-    cout << "Jumlah pemesanan yang dimiliki oleh Jeki: " << countJeki << "\n\n";
 
     // Count Penonton yang Tidak Memiliki Relasi
 
@@ -589,18 +747,23 @@ int main()
     cout << "SHOW PENONTON BESERTA SEMUA FILM YANG DITONTON\n";
     showPenontonDanFilm(headPenonton, firstFilm);
 
+    // Count Jumlah Relasi Penonton Film Tertentu
+    cout << "COUNT JUMLAH RELASI UNTUK PENONTON 'Jeki' \n";
+    int countJeki = countRelasiPenonton(p4, firstFilm);
+    cout << "Jumlah pemesanan yang dimiliki oleh Jeki: " << countJeki << "\n\n";
+
     // Delete Penonton (Child)
     cout << "DELETE PENONTON 'Jeki' (C-004)\n";
     cout << "Cek relasi Jeki sebelum hapus:\n";
-    findPemesanan(f2, p4); // Ada relasi di F-002
-    findPemesanan(f3, p4); // Ada relasi di F-003
+    findPemesanan(f2, p4);
+    findPemesanan(f1, p4);
 
     // Hapus Penonton Jeki (C-004). Menghapus dari List Penonton DAN relasinya di semua Film.
     deletePenonton(headPenonton, firstFilm, p4);
 
     cout << "\nCek relasi Jeki setelah hapus :\n";
     findPemesanan(f2, p4);
-    findPemesanan(f3, p4);
+    findPemesanan(f1, p4);
 
     cout << "\nLIST PENONTON Setelah Hapus 'Jeki':\n";
     showAllPenonton(headPenonton);
