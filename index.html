@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo Aplikasi Bioskop (Linked List UI)</title>
+    <style>
+      :root {
+        --primary: #2563eb;
+        --danger: #ef4444;
+        --bg: #f3f4f6;
+        --card-bg: #ffffff;
+        --text: #1f2937;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: var(--primary);
+        margin-bottom: 30px;
+      }
+
+      /* Layout Grid */
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+      }
+
+      @media (max-width: 900px) {
+        .dashboard {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Panels */
+      .panel {
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+      }
+
+      .panel h2 {
+        margin-top: 0;
+        border-bottom: 2px solid var(--bg);
+        padding-bottom: 10px;
+        font-size: 1.2rem;
+      }
+
+      /* Forms */
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+      }
+
+      button:hover {
+        background-color: #1d4ed8;
+      }
+      button.btn-delete {
+        background-color: var(--danger);
+        margin-top: 5px;
+        font-size: 0.8rem;
+        padding: 5px;
+      }
+
+      /* Cards List */
+      .list-container {
+        margin-top: 20px;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .card {
+        background: #f9fafb;
+        border-left: 4px solid var(--primary);
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+      }
+      .card-title {
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .card-sub {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin: 8px 0px;
+      }
+
+      /* Relation Badges */
+      .badge-list {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .badge {
+        background: #dbeafe;
+        color: #1e40af;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .badge-delete {
+        cursor: pointer;
+        color: var(--danger);
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sistem Pemesanan Jadwal Tiket Bioskop</h1>
+
+      <div class="dashboard">
+        <div class="panel">
+          <h2>1. Parent (Film)</h2>
+          <div class="form-group">
+            <label>Judul Film</label>
+            <input
+              type="text"
+              id="inputJudul"
+              placeholder="Contoh: Spider-Man" />
+          </div>
+          <div class="form-group">
+            <label>Tanggal Tayang</label>
+            <input type="text" id="inputTanggal" placeholder="20-12-2025" />
+          </div>
+          <div class="form-group">
+            <label>Studio & Jam</label>
+            <input type="text" id="inputStudio" placeholder="Std 1 - 19:00" />
+          </div>
+          <button onclick="uiAddFilm()">Tambah Film</button>
+
+          <div id="listFilm" class="list-container"></div>
+        </div>
+
+        <div class="panel">
+          <h2>2. Child (Penonton)</h2>
+          <div class="form-group">
+            <label>Nama Penonton</label>
+            <input type="text" id="inputNama" placeholder="Nama Lengkap" />
+          </div>
+          <div class="form-group">
+            <label>No. Handphone</label>
+            <input type="text" id="inputHP" placeholder="08xxx" />
+          </div>
+          <button onclick="uiAddPenonton()">Tambah Penonton</button>
+
+          <div id="listPenonton" class="list-container"></div>
+        </div>
+
+        <div class="panel">
+          <h2>3. Relasi (Pemesanan)</h2>
+          <div class="form-group">
+            <label>Pilih Film</label>
+            <select id="selectFilm">
+              <option value="">-- Pilih Film --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pilih Penonton</label>
+            <select id="selectPenonton">
+              <option value="">-- Pilih Penonton --</option>
+            </select>
+          </div>
+          <button onclick="uiAddRelasi()">Beli Tiket</button>
+
+          <!-- <div
+            style="
+              margin-top: 20px;
+              padding: 10px;
+              background: #e0f2fe;
+              border-radius: 5px;
+              font-size: 0.9rem;
+            ">
+            <strong>Info Logika:</strong><br />
+            Aplikasi ini menggunakan JavaScript Class untuk mensimulasikan
+            Linked List. <br /><br />
+            Saat Anda menghapus Film, semua tiket terkait akan terhapus (Cascade
+            Delete).
+          </div> -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // =========================================
+      // 1. DATA STRUCTURE (Linked List Logic)
+      // =========================================
+
+      // Class Node Relation (Pemesanan)
+      class RelationNode {
+        constructor(penonton) {
+          this.penonton = penonton; // Reference to Penonton Object
+          this.next = null; // Pointer next
+        }
+      }
+
+      // Class Node Parent (Film)
+      class FilmNode {
+        constructor(id, judul, studio,tanggal) {
+          this.id = id;
+          this.judul = judul;
+          this.tanggal = tanggal;
+          this.studio = studio;
+          this.next = null; // Pointer next
+          this.prev = null; // Pointer prev (Doubly)
+          this.relasiHead = null; // Head of Relation List
+        }
+      }
+
+      // Class Node Child (Penonton)
+      class PenontonNode {
+        constructor(id, nama, hp) {
+          this.id = id;
+          this.nama = nama;
+          this.hp = hp;
+          this.next = null; // Pointer next
+        }
+      }
+
+      // Global Heads
+      let headFilm = null;
+      let tailFilm = null; // Helper for O(1) insert at tail
+      let headPenonton = null;
+
+      // Counters for ID
+      let filmCounter = 1;
+      let penontonCounter = 1;
+
+      // =========================================
+      // 2. LOGIC FUNCTIONS (Backend Simulation)
+      // =========================================
+
+      function addFilm(judul, studio,tanggal) {
+        const id = "F-" + String(filmCounter++).padStart(3, "0");
+        const newNode = new FilmNode(id, judul, studio,tanggal);
+
+        if (!headFilm) {
+          headFilm = newNode;
+          tailFilm = newNode;
+        } else {
+          tailFilm.next = newNode;
+          newNode.prev = tailFilm;
+          tailFilm = newNode;
+        }
+        return newNode;
+      }
+
+      function addPenonton(nama, hp) {
+        const id = "C-" + String(penontonCounter++).padStart(3, "0");
+        const newNode = new PenontonNode(id, nama, hp);
+
+        if (!headPenonton) {
+          headPenonton = newNode;
+        } else {
+          let temp = headPenonton;
+          while (temp.next) temp = temp.next;
+          temp.next = newNode;
+        }
+        return newNode;
+      }
+
+      function addRelasi(filmObj, penontonObj) {
+        // Check Duplicate
+        let check = filmObj.relasiHead;
+        while (check) {
+          if (check.penonton === penontonObj) {
+            alert("Penonton ini sudah membeli tiket film tersebut!");
+            return;
+          }
+          check = check.next;
+        }
+
+        const newRel = new RelationNode(penontonObj);
+
+        // Insert at end of relation list
+        if (!filmObj.relasiHead) {
+          filmObj.relasiHead = newRel;
+        } else {
+          let temp = filmObj.relasiHead;
+          while (temp.next) temp = temp.next;
+          temp.next = newRel;
+        }
+      }
+
+      function deleteFilm(idFilm) {
+        let curr = headFilm;
+        while (curr) {
+          if (curr.id === idFilm) {
+            // Logic Hapus Node Doubly Linked List
+            if (curr === headFilm) {
+              headFilm = curr.next;
+              if (headFilm) headFilm.prev = null;
+              else tailFilm = null;
+            } else if (curr === tailFilm) {
+              tailFilm = curr.prev;
+              tailFilm.next = null;
+            } else {
+              curr.prev.next = curr.next;
+              curr.next.prev = curr.prev;
+            }
+            // JavaScript Garbage Collector cleans the relations automatically,
+            // but conceptually the relations are gone because the HeadFilm is gone.
+            return;
+          }
+          curr = curr.next;
+        }
+      }
+
+      function deletePenonton(idPenonton) {
+        // 1. Delete relations first in all films
+        let f = headFilm;
+        while (f) {
+          let r = f.relasiHead;
+          let prevR = null;
+          while (r) {
+            if (r.penonton.id === idPenonton) {
+              if (!prevR) f.relasiHead = r.next;
+              else prevR.next = r.next;
+              // break; // Assuming 1 ticket per film per person
+            }
+            prevR = r;
+            r = r.next;
+          }
+          f = f.next;
+        }
+
+        // 2. Delete Penonton Node
+        let curr = headPenonton;
+        let prev = null;
+        while (curr) {
+          if (curr.id === idPenonton) {
+            if (!prev) headPenonton = curr.next;
+            else prev.next = curr.next;
+            return;
+          }
+          prev = curr;
+          curr = curr.next;
+        }
+      }
+
+      function deleteRelasi(idFilm, idPenonton) {
+        let f = headFilm;
+        // Find film
+        while (f && f.id !== idFilm) f = f.next;
+
+        if (f) {
+          let r = f.relasiHead;
+          let prevR = null;
+          while (r) {
+            if (r.penonton.id === idPenonton) {
+              if (!prevR) f.relasiHead = r.next;
+              else prevR.next = r.next;
+              renderUI(); // Refresh UI
+              return;
+            }
+            prevR = r;
+            r = r.next;
+          }
+        }
+      }
+
+      // =========================================
+      // 3. UI FUNCTIONS (DOM Manipulation)
+      // =========================================
+
+      function uiAddFilm() {
+        const judul = document.getElementById("inputJudul").value;
+        const studio = document.getElementById("inputStudio").value;
+        const tanggal = document.getElementById("inputTanggal").value;
+        if (!judul || !studio || tanggal) return alert("Isi data film!");
+
+        addFilm(judul, studio,tanggal);
+        document.getElementById("inputJudul").value = "";
+        document.getElementById("inputStudio").value = "";
+        document.getElementById("inputTanggal").value = "";
+        renderUI();
+      }
+
+      function uiAddPenonton() {
+        const nama = document.getElementById("inputNama").value;
+        const hp = document.getElementById("inputHP").value;
+        if (!nama || !hp) return alert("Isi data penonton!");
+
+        addPenonton(nama, hp);
+        document.getElementById("inputNama").value = "";
+        document.getElementById("inputHP").value = "";
+        renderUI();
+      }
+
+      function uiAddRelasi() {
+        const idFilm = document.getElementById("selectFilm").value;
+        const idPenonton = document.getElementById("selectPenonton").value;
+
+        if (!idFilm || !idPenonton) return alert("Pilih Film dan Penonton!");
+
+        // Find Objects manually (simulating search)
+        let fObj = null;
+        let currF = headFilm;
+        while (currF) {
+          if (currF.id === idFilm) fObj = currF;
+          currF = currF.next;
+        }
+
+        let pObj = null;
+        let currP = headPenonton;
+        while (currP) {
+          if (currP.id === idPenonton) pObj = currP;
+          currP = currP.next;
+        }
+
+        if (fObj && pObj) {
+          addRelasi(fObj, pObj);
+          renderUI();
+        }
+      }
+
+      // Fungsi Render Utama: Mengubah Linked List menjadi HTML
+      function renderUI() {
+        const listFilmDiv = document.getElementById("listFilm");
+        const listPenontonDiv = document.getElementById("listPenonton");
+        const selectFilm = document.getElementById("selectFilm");
+        const selectPenonton = document.getElementById("selectPenonton");
+
+        // Reset
+        listFilmDiv.innerHTML = "";
+        listPenontonDiv.innerHTML = "";
+        selectFilm.innerHTML = '<option value="">-- Pilih Film --</option>';
+        selectPenonton.innerHTML =
+          '<option value="">-- Pilih Penonton --</option>';
+
+        // 1. Render Films (Parent)
+        let f = headFilm;
+        while (f) {
+          // Dropdown option
+          const opt = document.createElement("option");
+          opt.value = f.id;
+          opt.innerText = f.judul;
+          selectFilm.appendChild(opt);
+
+          // Card HTML
+          const card = document.createElement("div");
+          card.className = "card";
+
+          // Generate list penonton di dalam film (Relation List)
+          let viewersHTML = '<div class="badge-list">';
+          let r = f.relasiHead;
+          let count = 0;
+          while (r) {
+            viewersHTML += `
+                    <span class="badge">
+                        ${r.penonton.nama} 
+                        <span class="badge-delete" onclick="deleteRelasi('${f.id}', '${r.penonton.id}')">&times;</span>
+                    </span>`;
+            r = r.next;
+            count++;
+          }
+          viewersHTML += "</div>";
+
+          card.innerHTML = `
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">${f.judul}</div>
+                        <div class="card-sub">${f.tanggal}</div>
+                        <div class="card-sub">${f.id} | ${f.studio}</div>
+                    </div>
+                    <div style="font-weight:bold; color:var(--primary);">${count} Tiket</div>
+                </div>
+                <hr style="border:0; border-top:1px solid #e5e7eb; margin:10px 0;">
+                <div style="font-size:0.8rem; color:#6b7280;">Daftar Penonton:</div>
+                ${
+                  count === 0
+                    ? "<small>Belum ada penonton</small>"
+                    : viewersHTML
+                }
+                <button class="btn-delete" onclick="confirmDeleteFilm('${
+                  f.id
+                }')">Hapus Film</button>
+            `;
+          listFilmDiv.appendChild(card);
+          f = f.next;
+        }
+
+        // 2. Render Penonton (Child)
+        let p = headPenonton;
+        while (p) {
+          // Dropdown option
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.innerText = p.nama;
+          selectPenonton.appendChild(opt);
+
+          // Card HTML
+          // Mencari history tontonan (Traversing Parent to find Child)
+          let historyHTML = '<div class="badge-list">';
+          let tempF = headFilm;
+          let historyCount = 0;
+          while (tempF) {
+            let tempR = tempF.relasiHead;
+            while (tempR) {
+              if (tempR.penonton === p) {
+                historyHTML += `<span class="badge" style="background:#fce7f3; color:#be185d;">${tempF.judul}</span>`;
+                historyCount++;
+              }
+              tempR = tempR.next;
+            }
+            tempF = tempF.next;
+          }
+          historyHTML += "</div>";
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.style.borderLeftColor = "#8b5cf6"; // Different color for child
+          card.innerHTML = `
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">${p.nama}</div>
+                        <div class="card-sub">${p.id} | ${p.hp}</div>
+                    </div>
+                </div>
+                <hr style="border:0; border-top:1px solid #e5e7eb; margin:10px 0;">
+                <div style="font-size:0.8rem; color:#6b7280;">History Tontonan:</div>
+                ${
+                  historyCount === 0
+                    ? "<small>Belum menonton apapun</small>"
+                    : historyHTML
+                }
+                <button class="btn-delete" onclick="confirmDeletePenonton('${
+                  p.id
+                }')">Hapus Penonton</button>
+            `;
+          listPenontonDiv.appendChild(card);
+          p = p.next;
+        }
+      }
+
+      // Delete Helpers
+      function confirmDeleteFilm(id) {
+        if (
+          confirm(
+            "Yakin hapus film ini? Semua tiket terkait juga akan terhapus.",
+          )
+        ) {
+          deleteFilm(id);
+          renderUI();
+        }
+      }
+
+      function confirmDeletePenonton(id) {
+        if (confirm("Yakin hapus penonton ini?")) {
+          deletePenonton(id);
+          renderUI();
+        }
+      }
+
+      // Init Dummy Data
+      addFilm("Avengers: Endgame", "Studio 1 - 15:00","20-12-2025");
+      addFilm("Harry Potter", "Studio 2 - 19:00","13-01-2026");
+      addPenonton("Nabil", "08976625882");
+      addPenonton("Gitta", "08652778827");
+      addPenonton("Khalisa", "0865287452");
+
+      // Auto render start
+      renderUI();
+    </script>
+  </body>
+</html>
