@@ -419,7 +419,7 @@
         const judul = document.getElementById("inputJudul").value;
         const studio = document.getElementById("inputStudio").value;
         const tanggal = document.getElementById("inputTanggal").value;
-        if (!judul || !studio || tanggal) return alert("Isi data film!");
+        if (!judul || !studio || !tanggal) return alert("Isi data film!");
 
         addFilm(judul, studio,tanggal);
         document.getElementById("inputJudul").value = "";
