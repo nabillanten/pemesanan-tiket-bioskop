@@ -572,7 +572,6 @@ void countRelasiSetiapFilm(Film *headFilm) //NABIL
 // ==========================================
 // MAIN FUNCTION (MENU UTAMA)
 // ==========================================
-
 int main()
 {
     // Struktur Data
@@ -581,8 +580,7 @@ int main()
     Penonton *headPenonton = NULL;
 
     // Variabel Input
-    int mainMenu;
-    char subMenu;
+    int menu;
     string inJudul, inTanggal, inJam, inStudio, inNama, inHP, inNamaBaru;
     Film *selectedFilm = NULL;
     Penonton *selectedPenonton = NULL;
@@ -590,250 +588,137 @@ int main()
 
     do
     {
-        // TAMPILAN MENU UTAMA
-        cout << "\n=====================================\n";
-        cout << "SISTEM JADWAL PEMESANAN TIKET BIOSKOP        \n";
-        cout << "=====================================\n";
-        cout << "1. MENU PARENT (Kelola Film)\n";
-        cout << "2. MENU CHILD (Kelola Penonton)\n";
-        cout << "3. MENU RELASI (Transaksi & Laporan)\n";
-        cout << "0. EXIT\n";
-        cout << "====================================\n";
-        cout << "Pilih Menu [1/2/3/0]: ";
-        cin >> mainMenu;
+        cout << "\n======================================================\n";
+        cout << "      SISTEM JADWAL PEMESANAN TIKET BIOSKOP (FLAT)    \n";
+        cout << "======================================================\n";
+        cout << " [1]  Insert Film (Parent)\n";
+        cout << " [2]  Delete Film\n";
+        cout << " [3]  Cari Film\n";
+        cout << " [4]  Tampilkan Semua Film\n";
+        cout << " [5]  Tampilkan Penonton di Film Tertentu\n";
+        cout << " [6]  Hitung Jumlah Penonton per Film\n";
+        cout << "------------------------------------------------------\n";
+        cout << " [7]  Insert Penonton (Child)\n";
+        cout << " [8]  Delete Penonton\n";
+        cout << " [9]  Cari Penonton\n";
+        cout << " [10] Tampilkan Semua Penonton\n";
+        cout << " [11] Riwayat Film yang ditonton User\n";
+        cout << " [12] Hitung Total Tiket per User\n";
+        cout << " [13] Hitung User yang Belum Beli Tiket\n";
+        cout << "------------------------------------------------------\n";
+        cout << " [14] Beli Tiket (Insert Relasi)\n";
+        cout << " [15] Batalkan Tiket (Delete Relasi)\n";
+        cout << " [16] Ganti Nama di Tiket (Edit Relasi)\n";
+        cout << " [17] Cek Status Tiket (Find Relasi)\n";
+        cout << " [18] Show All: Film & Penontonnya\n";
+        cout << " [19] Show All: Penonton & Filmnya\n";
+        cout << " [0]  EXIT\n";
+        cout << "======================================================\n";
+        cout << "Pilih Menu >> ";
+        cin >> menu;
         clearInputBuffer();
 
-        if (mainMenu == 1)
+        switch (menu)
         {
-            // MENU PARENT
-            do
-            {
-                cout << "\n--- [ MENU PARENT : FILM ] ---\n";
-                cout << "a. Insert Film\n";
-                cout << "b. Delete Film\n";
-                cout << "c. Find Film\n";
-                cout << "d. Show All Film\n";
-                cout << "e. Show Penonton di Film Tertentu\n";
-                cout << "f. Count Relasi per Film\n";
-                cout << "x. Kembali ke Menu Utama\n";
-                cout << "Pilihan: ";
-                cin >> subMenu;
-                clearInputBuffer();
+        // --- KELOMPOK FILM ---
+        case 1:
+            cout << ">> Judul Film : "; getline(cin, inJudul);
+            cout << ">> Tanggal    : "; getline(cin, inTanggal);
+            cout << ">> Jam        : "; getline(cin, inJam);
+            cout << ">> Studio     : "; getline(cin, inStudio);
+            insertFilm(inJudul, inTanggal, inJam, inStudio, firstFilm, lastFilm);
+            break;
+        case 2:
+            cout << ">> Judul Film yg dihapus: "; getline(cin, inJudul);
+            deleteFilm(firstFilm, lastFilm, inJudul);
+            break;
+        case 3:
+            cout << ">> Cari Judul Film: "; getline(cin, inJudul);
+            selectedFilm = findFilmByJudul(inJudul, firstFilm);
+            if (selectedFilm) cout << "Ditemukan! ID: " << selectedFilm->id_film << ", Studio: " << selectedFilm->studio << endl;
+            else cout << "Tidak ditemukan.\n";
+            break;
+        case 4:
+            showAllFilm(firstFilm);
+            break;
+        case 5:
+            cout << ">> Masukan Judul Film: "; getline(cin, inJudul);
+            showPenontonFromFilm(findFilmByJudul(inJudul, firstFilm));
+            break;
+        case 6:
+            countRelasiSetiapFilm(firstFilm);
+            break;
 
-                switch (subMenu)
-                {
-                case 'a': // Insert
-                    cout << ">> Judul Film     : ";
-                    getline(cin, inJudul);
-                    cout << ">> Tanggal Tayang : ";
-                    getline(cin, inTanggal);
-                    cout << ">> Jam Tayang     : ";
-                    getline(cin, inJam);
-                    cout << ">> Studio         : ";
-                    getline(cin, inStudio);
-                    insertFilm(inJudul, inTanggal, inJam, inStudio, firstFilm, lastFilm);
-                    break;
-                case 'b': // Delete
-                    cout << ">> Judul Film yg dihapus: ";
-                    getline(cin, inJudul);
-                    deleteFilm(firstFilm, lastFilm, inJudul);
-                    break;
-                case 'c': // Find
-                    cout << ">> Cari Judul Film: ";
-                    getline(cin, inJudul);
-                    selectedFilm = findFilmByJudul(inJudul, firstFilm);
-                    if (selectedFilm)
-                        cout << "Ditemukan! ID: " << selectedFilm->id_film << ", Studio: " << selectedFilm->studio << endl;
-                    else
-                        cout << "Tidak ditemukan.\n";
-                    break;
-                case 'd': // Show All
-                    showAllFilm(firstFilm);
-                    break;
-                case 'e': // Show Child by Parent
-                    cout << ">> Masukan Judul Film: ";
-                    getline(cin, inJudul);
-                    selectedFilm = findFilmByJudul(inJudul, firstFilm);
-                    showPenontonFromFilm(selectedFilm);
-                    break;
-                case 'f': // Count - NABIL
-                    countRelasiSetiapFilm(firstFilm);
-                    break;
-                case 'x':
-                    break;
-                default:
-                    cout << "Pilihan salah.\n";
-                }
-                if (subMenu != 'x')
-                    pause();
-            } while (subMenu != 'x');
-        }
-        else if (mainMenu == 2)
-        {
-            // MENU CHILD
-            do
-            {
-                cout << "\n--- [ MENU CHILD : PENONTON ] ---\n";
-                cout << "a. Insert Penonton\n";
-                cout << "b. Delete Penonton\n";
-                cout << "c. Find Penonton\n";
-                cout << "d. Show All Penonton\n";
-                cout << "e. Show Film yang ditonton (History User)\n";
-                cout << "f. Count Film yang ditonton User\n";
-                cout << "g. Count User tanpa Tiket\n";
-                cout << "x. Kembali ke Menu Utama\n";
-                cout << "Pilihan: ";
-                cin >> subMenu;
-                clearInputBuffer();
+        // --- KELOMPOK PENONTON ---
+        case 7:
+            cout << ">> Nama Penonton : "; getline(cin, inNama);
+            cout << ">> No Handphone  : "; getline(cin, inHP);
+            insertPenonton(inNama, inHP, headPenonton);
+            break;
+        case 8:
+            cout << ">> Hapus Penonton (Nama): "; getline(cin, inNama);
+            deletePenonton(headPenonton, firstFilm, findPenonton(inNama, headPenonton));
+            break;
+        case 9:
+            cout << ">> Cari Penonton (Nama): "; getline(cin, inNama);
+            selectedPenonton = findPenonton(inNama, headPenonton);
+            if (selectedPenonton) cout << "Ditemukan! ID: " << selectedPenonton->id_penonton << ", HP: " << selectedPenonton->no_handphone << endl;
+            else cout << "Tidak ditemukan.\n";
+            break;
+        case 10:
+            showAllPenonton(headPenonton);
+            break;
+        case 11:
+            cout << ">> Nama Penonton: "; getline(cin, inNama);
+            showFilmFromPenonton(findPenonton(inNama, headPenonton), firstFilm);
+            break;
+        case 12:
+            cout << ">> Nama Penonton: "; getline(cin, inNama);
+            countRelasiPenonton(findPenonton(inNama, headPenonton), firstFilm);
+            break;
+        case 13:
+            countPenontonTanpaRelasi(headPenonton, firstFilm);
+            break;
 
-                switch (subMenu)
-                {
-                case 'a': // Insert
-                    cout << ">> Nama Penonton : ";
-                    getline(cin, inNama);
-                    cout << ">> No Handphone  : ";
-                    getline(cin, inHP);
-                    insertPenonton(inNama, inHP, headPenonton);
-                    break;
-                case 'b': // Delete
-                    cout << ">> Hapus Penonton (Nama): ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    deletePenonton(headPenonton, firstFilm, selectedPenonton);
-                    break;
-                case 'c': // Find
-                    cout << ">> Cari Penonton (Nama): ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    if (selectedPenonton)
-                        cout << "Ditemukan! ID: " << selectedPenonton->id_penonton << ", HP: " << selectedPenonton->no_handphone << endl;
-                    else
-                        cout << "Tidak ditemukan.\n";
-                    break;
-                case 'd': // Show All
-                    showAllPenonton(headPenonton);
-                    break;
-                case 'e': // Show Parent by Child GITTA
-                    cout << ">> Nama Penonton: ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    showFilmFromPenonton(selectedPenonton, firstFilm);
-                    break;
-                case 'f': // Count
-                    cout << ">> Nama Penonton: ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    if (selectedPenonton)
-                        countRelasiPenonton(selectedPenonton, firstFilm);
-                    else
-                        cout << "User tidak ditemukan.\n";
-                    break;
-                case 'g': // Count No Relation
-                    countPenontonTanpaRelasi(headPenonton, firstFilm);
-                    break;
-                case 'x':
-                    break;
-                default:
-                    cout << "Pilihan salah.\n";
-                }
-                if (subMenu != 'x')
-                    pause();
-            } while (subMenu != 'x');
-        }
-        else if (mainMenu == 3)
-        {
-            // MENU RELASI
-            do
-            {
-                cout << "\n--- [ MENU RELASI : TRANSAKSI ] ---\n";
-                cout << "a. Insert Relation (Beli Tiket)\n";
-                cout << "b. Delete Relation (Batal Tiket)\n";
-                cout << "c. Edit Relation (Ganti Nama di Tiket)\n";
-                cout << "d. Find Relation (Cek Status Tiket)\n";
-                cout << "e. Show All Parent beserta Child\n";
-                cout << "f. Show All Child beserta Parent\n";
-                cout << "x. Kembali ke Menu Utama\n";
-                cout << "Pilihan: ";
-                cin >> subMenu;
-                clearInputBuffer();
+        // --- KELOMPOK RELASI ---
+        case 14:
+            cout << ">> Judul Film : "; getline(cin, inJudul);
+            cout << ">> Nama Penonton : "; getline(cin, inNama);
+            insertPemesanan(findFilmByJudul(inJudul, firstFilm), findPenonton(inNama, headPenonton));
+            break;
+        case 15:
+            cout << ">> Judul Film : "; getline(cin, inJudul);
+            cout << ">> Nama Penonton : "; getline(cin, inNama);
+            deletePemesanan(findFilmByJudul(inJudul, firstFilm), findPenonton(inNama, headPenonton));
+            break;
+        case 16:
+            cout << ">> Judul Film : "; getline(cin, inJudul);
+            cout << ">> Nama Penonton LAMA : "; getline(cin, inNama);
+            cout << ">> Nama Penonton BARU : "; getline(cin, inNamaBaru);
+            editPemesanan(findFilmByJudul(inJudul, firstFilm), findPenonton(inNama, headPenonton), findPenonton(inNamaBaru, headPenonton));
+            break;
+        case 17:
+            cout << ">> Judul Film : "; getline(cin, inJudul);
+            cout << ">> Nama Penonton : "; getline(cin, inNama);
+            findPemesanan(findFilmByJudul(inJudul, firstFilm), findPenonton(inNama, headPenonton));
+            break;
+        case 18:
+            showAllFilmWithPenonton(firstFilm);
+            break;
+        case 19:
+            showPenontonDanFilm(headPenonton, firstFilm);
+            break;
 
-                switch (subMenu)
-                {
-                case 'a': // Insert
-                    cout << ">> Judul Film : ";
-                    getline(cin, inJudul);
-                    selectedFilm = findFilmByJudul(inJudul, firstFilm);
-                    if (!selectedFilm)
-                    {
-                        cout << "Film tidak ada.\n";
-                        break;
-                    }
-                    cout << ">> Nama Penonton : ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    if (!selectedPenonton)
-                    {
-                        cout << "Penonton tidak ada.\n";
-                        break;
-                    }
-                    insertPemesanan(selectedFilm, selectedPenonton);
-                    break;
-                case 'b': // Delete
-                    cout << ">> Judul Film : ";
-                    getline(cin, inJudul);
-                    selectedFilm = findFilmByJudul(inJudul, firstFilm);
-                    cout << ">> Nama Penonton : ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    deletePemesanan(selectedFilm, selectedPenonton);
-                    break;
-                case 'c': // Edit
-                    cout << ">> Judul Film : ";
-                    getline(cin, inJudul);
-                    selectedFilm = findFilmByJudul(inJudul, firstFilm);
-                    cout << ">> Nama Penonton LAMA : ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    cout << ">> Nama Penonton BARU : ";
-                    getline(cin, inNamaBaru);
-                    newPenontonPtr = findPenonton(inNamaBaru, headPenonton);
-                    editPemesanan(selectedFilm, selectedPenonton, newPenontonPtr);
-                    break;
-                case 'd': // Find
-                    cout << ">> Judul Film : ";
-                    getline(cin, inJudul);
-                    selectedFilm = findFilmByJudul(inJudul, firstFilm);
-                    cout << ">> Nama Penonton : ";
-                    getline(cin, inNama);
-                    selectedPenonton = findPenonton(inNama, headPenonton);
-                    findPemesanan(selectedFilm, selectedPenonton);
-                    break;
-                case 'e': // Show Parent + Child
-                    showAllFilmWithPenonton(firstFilm);
-                    break;
-                case 'f': // Show Child + Parent - KHALISA
-                    showPenontonDanFilm(headPenonton, firstFilm);
-                    break;
-                case 'x':
-                    break;
-                default:
-                    cout << "Pilihan salah.\n";
-                }
-                if (subMenu != 'x')
-                    pause();
-            } while (subMenu != 'x');
-        }
-        else if (mainMenu == 0)
-        {
+        case 0:
             cout << "Terima kasih!\n";
-        }
-        else
-        {
+            break;
+        default:
             cout << "Menu tidak tersedia.\n";
-            pause();
         }
 
-    } while (mainMenu != 0);
+        if (menu != 0) pause();
+
+    } while (menu != 0);
 
     return 0;
 }
